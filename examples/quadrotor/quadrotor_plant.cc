@@ -127,6 +127,12 @@ void QuadrotorPlant<T>::DoCalcTimeDerivatives(
   VectorX<T> xDt(12);
   xDt << state.template tail<6>(), xyzDDt, rpyDDt;
   derivatives->SetFromVector(xDt);
+  std::cout << Faero_B(2) << "\n";
+  std::cout << "Time : "<< context.get_time()<< "\n";
+
+  std::cout << "Thrust to weight ratio : "<<Faero_B(2)/(-1*Fgravity_N(2)) << "\n";
+
+  std::cout << "z Position : "<< state(2) << "\n";
 }
 
 std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(

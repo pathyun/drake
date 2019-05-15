@@ -1,0 +1,379 @@
+# -*- python -*-
+
+load(
+    "//tools:drake.bzl",
+    "drake_cc_googletest",
+    "drake_cc_library",
+    "drake_cc_binary",
+)
+load("//tools/install:install_data.bzl", "install_data")
+load("//tools/lint:lint.bzl", "add_lint_tests")
+
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+
+)
+
+cc_binary(
+    name = "testfileout",
+    srcs = ["testfileout.cc"],
+)
+
+
+drake_cc_library(
+    name = "robobee_plant",
+    srcs = ["robobee_plant.cc"],
+    hdrs = ["robobee_plant.h"],
+    deps = [
+        "//common:default_scalars",
+        "//math:geometric_transform",
+        "//math:gradient",
+        "//systems/controllers:linear_quadratic_regulator",
+        "//systems/framework:leaf_system",
+        "//systems/primitives:affine_system",
+        "//util",
+    ],
+)
+drake_cc_library(
+    name = "robobee_plant_rpy",
+    srcs = ["robobee_plant_rpy.cc"],
+    hdrs = ["robobee_plant_rpy.h"],
+    deps = [
+        "//common:default_scalars",
+        "//math:geometric_transform",
+        "//math:gradient",
+        "//systems/controllers:linear_quadratic_regulator",
+        "//systems/framework:leaf_system",
+        "//systems/primitives:affine_system",
+        "//util",
+    ],
+)
+
+drake_cc_binary(
+    name = "run_quadrotor_dynamics",
+    srcs = ["run_quadrotor_dynamics.cc"],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = [
+        "--duration=0.1",
+        "--initial_height=0.051",
+    ],
+    deps = [
+        ":robobee_plant",
+        "//common:find_resource",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "//systems/primitives:constant_vector_source",
+        "@gflags",
+    ],
+)
+
+drake_cc_binary(
+    name = "run_robobee_lqr",
+    srcs = ["run_robobee_lqr.cc"],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = [
+        "-simulation_trials=2",
+        "-simulation_real_time_rate=0.0",
+    ],
+    deps = [
+        ":robobee_plant_rpy",
+        "//common:find_resource",
+        "//common:is_approx_equal_abstol",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "@gflags",
+    ],
+)
+
+drake_cc_binary(
+    name = "run_robobee_lqr_quaternion",
+    srcs = ["run_robobee_lqr_quaternion.cc"],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = [
+        "-simulation_trials=2",
+        "-simulation_real_time_rate=0.0",
+    ],
+    deps = [
+        ":robobee_plant",
+        "//common:find_resource",
+        "//common:is_approx_equal_abstol",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "@gflags",
+    ],
+)
+
+drake_cc_binary(
+    name = "run_robobee_FL_quaternion",
+    srcs = ["run_robobee_FL_quaternion.cc",
+            "RobobeeFLController.h",],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = [
+        "-simulation_trials=2",
+        "-simulation_real_time_rate=0.0",
+    ],
+    deps = [
+        ":robobee_plant",
+        "//math:continuous_algebraic_riccati_equation",
+        "//common:find_resource",
+        "//common:is_approx_equal_abstol",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "//systems/primitives:multiplexer",
+        "//systems/primitives:demultiplexer",
+        "//systems/primitives:integrator",
+        "//multibody/joints",
+        "@gflags",
+    ],
+)
+
+
+drake_cc_binary(
+    name = "run_robobee_CLFQP_quaternion",
+    srcs = ["run_robobee_CLFQP_quaternion.cc",
+            "RobobeeCLFQPController.h",],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = [
+        "-simulation_trials=2",
+        "-simulation_real_time_rate=0.0",
+    ],
+    deps = [
+        ":robobee_plant",
+        "//math:continuous_algebraic_riccati_equation",
+        "//common:find_resource",
+        "//common:is_approx_equal_abstol",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "//systems/primitives:multiplexer",
+        "//systems/primitives:demultiplexer",
+        "//systems/primitives:integrator",
+        "@gflags",
+    ],
+)
+
+drake_cc_binary(
+    name = "run_robobee_traj_optimization",
+    srcs = ["test/run_robobee_traj_optimization.cc"],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = ["-realtime_factor=0.0"],
+    deps = [
+        ":robobee_plant",
+        "//common:find_resource",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/rigid_body_plant:rigid_body_plant",
+        "//multibody/joints",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis",
+        "//systems/controllers:linear_quadratic_regulator",
+        "//systems/primitives:trajectory_source",
+        "//systems/trajectory_optimization:direct_collocation",
+        ":TrajectoryOptPlot",
+        "@gflags",
+    ],
+)
+
+drake_cc_library(
+    name = "TrajectoryOptPlot",
+    srcs = ["TrajectoryOptPlot.cc",
+            "TrajectoryOptPlot.h"],
+    deps = ["//systems/trajectory_optimization:direct_collocation",
+            "//common/proto:call_python"], 
+)
+drake_cc_binary(
+    name = "run_robobee_traj_optimization_rpy",
+    srcs = ["test/run_robobee_traj_optimization_rpy.cc"],
+    add_test_rule = 1,
+    data = [":models"],
+    test_rule_args = ["-realtime_factor=0.0"],
+    deps = [
+        ":robobee_plant_rpy",
+        "//common:find_resource",
+        "//lcm",
+        "//multibody:rigid_body_tree",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/rigid_body_plant:rigid_body_plant",
+        "//multibody/joints",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant:drake_visualizer",
+        "//systems/analysis",
+        "//systems/controllers:linear_quadratic_regulator",
+        "//systems/primitives:trajectory_source",
+        "//systems/trajectory_optimization:direct_collocation",
+        "@gflags",
+    ],
+)
+
+drake_cc_googletest(
+    name = "robobee_dynamics_test",
+    data = [":models"],
+    deps = [
+        ":robobee_plant",
+        "//common:find_resource",
+        "//common/test_utilities:eigen_matrix_compare",
+        "//multibody:rigid_body_tree_construction",
+        "//multibody/parsers",
+        "//multibody/rigid_body_plant",
+        "//systems/analysis:simulator",
+        "//systems/framework:diagram",
+        "//systems/framework/test_utilities",
+        "//systems/primitives:constant_vector_source",
+    ],
+)
+
+py_binary(
+    name = "IEEETAC_robobee_drag_control_FL_tracking_CLFQP_adaptive",
+    srcs = ["IEEETAC_robobee_drag_control_FL_tracking_CLFQP_adaptive.py"],
+    data = glob(["**"]),
+    # #glob(["*.out"]),
+    # ["u1_alpha3_2to3.out",
+    # "u2_alpha3_2to3.out",
+    # "u3_alpha3_2to3.out",
+    # "u4_alpha3_2to3.out",
+    # "u1_alpha1_2to3.out",
+    # "u1_alpha10_2to3.out",
+    # "roll3_2to3.out",
+    # "pitch3_2to3.out",
+    # "yaw3_2to3.out",
+    # "xalpha1_2to3.out",
+    # "yalpha1_2to3.out",
+    # "xalpha10_2to3.out",
+    # "yalpha10_2to3.out",
+    # "xalpha5_2to3.out",
+    # "yalpha5_2to3.out",
+    # "xalpha3_2to3_modified.out",
+    # "yalpha3_2to3_modified.out",
+    # ],
+    deps = [
+        "//bindings/pydrake",
+        "//examples/robobee:robobee_plant_aero"
+    ],
+)
+
+
+py_binary(
+    name = "robobee_plant_aero",
+    srcs = ["robobee_plant_aero.py"],
+    data = [":robobee_arena.urdf",
+    ],
+    deps = [
+        "//bindings/pydrake",
+    ],
+)
+
+py_binary(
+    name = "IEEETAC_robobee_full_w_hinge_2ndorder_drag_control_FL_tracking_passive_hinge_inverseMapping_CLF_QP",
+    srcs = ["IEEETAC_robobee_full_w_hinge_2ndorder_drag_control_FL_tracking_passive_hinge_inverseMapping_CLF_QP.py"],
+    data = ["//examples/robobee:chordlength_list_r_10.txt",
+     "//examples/robobee:chordlength_list_cr_10.txt",
+     "//examples/robobee:chordlength_list_yLE_10.txt"],
+    #glob(["**"]),
+    # #glob(["*.out"]),
+    # ["u1_alpha3_2to3.out",
+    # "u2_alpha3_2to3.out",
+    # "u3_alpha3_2to3.out",
+    # "u4_alpha3_2to3.out",
+    # "u1_alpha1_2to3.out",
+    # "u1_alpha10_2to3.out",
+    # "roll3_2to3.out",
+    # "pitch3_2to3.out",
+    # "yaw3_2to3.out",
+    # "xalpha1_2to3.out",
+    # "yalpha1_2to3.out",
+    # "xalpha10_2to3.out",
+    # "yalpha10_2to3.out",
+    # "xalpha5_2to3.out",
+    # "yalpha5_2to3.out",
+    # "xalpha3_2to3_modified.out",
+    # "yalpha3_2to3_modified.out",
+    # ],
+    deps = [
+        "//bindings/pydrake",
+        "//examples/robobee:robobee_plant_full_w_hinge_2ndorder_aero_passive_hinge"
+    ],
+)
+py_binary(
+    name = "IEEETAC_robobee_full_w_hinge_2ndorder_drag_control_FL_tracking_passive_hinge_inverseMapping_CLF_QP_v2",
+    srcs = ["IEEETAC_robobee_full_w_hinge_2ndorder_drag_control_FL_tracking_passive_hinge_inverseMapping_CLF_QP_v2.py"],
+    data = ["//examples/robobee:chordlength_list_r_10.txt",
+     "//examples/robobee:chordlength_list_cr_10.txt",
+     "//examples/robobee:chordlength_list_yLE_10.txt"],
+    #glob(["**"]),
+    # #glob(["*.out"]),
+    # ["u1_alpha3_2to3.out",
+    # "u2_alpha3_2to3.out",
+    # "u3_alpha3_2to3.out",
+    # "u4_alpha3_2to3.out",
+    # "u1_alpha1_2to3.out",
+    # "u1_alpha10_2to3.out",
+    # "roll3_2to3.out",
+    # "pitch3_2to3.out",
+    # "yaw3_2to3.out",
+    # "xalpha1_2to3.out",
+    # "yalpha1_2to3.out",
+    # "xalpha10_2to3.out",
+    # "yalpha10_2to3.out",
+    # "xalpha5_2to3.out",
+    # "yalpha5_2to3.out",
+    # "xalpha3_2to3_modified.out",
+    # "yalpha3_2to3_modified.out",
+    # ],
+    deps = [
+        "//bindings/pydrake",
+        "//examples/robobee:robobee_plant_full_w_hinge_2ndorder_aero_passive_hinge"
+    ],
+)
+
+py_binary(
+    name = "robobee_plant_full_w_hinge_2ndorder_aero_passive_hinge",
+    srcs = ["robobee_plant_full_w_hinge_2ndorder_aero_passive_hinge.py"],
+    data = [":robobee_full_w_hinge_arena.urdf",
+    ],
+    deps = [
+        "//bindings/pydrake",
+    ],
+)
+
+install_data()
+
+add_lint_tests()

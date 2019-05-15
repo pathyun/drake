@@ -1,0 +1,608 @@
+<?xml version="1.0" ?>
+
+<!-- adapted from Daniel Mellinger, Nathan Michael, Vijay Kumar, "Trajectory Generation and Control for Precise Aggressive Maneuvers with Quadrotors" -->
+
+<robot xmlns="http://drake.mit.edu"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://drake.mit.edu ../../../../pods/drake/doc/drakeURDF.xsd" name="robobee">
+  <link name="base_link">
+    <inertial>
+      <mass value="81"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.00142" ixy="0.0" ixz="0.0" iyy="0.00134" iyz="0.0" izz="0.00045"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.000"/>
+      <geometry>
+        <box size="0.0035 0.0035 0.014"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+      <material name="black">
+       <color rgba="0.1 0 0.1 0.5"/>
+     </material>
+    </visual>
+    <!-- note: the original hector quadrotor urdf had a (simplified, but still complex) collision mesh, too -->
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius=".3" length=".1"/>
+      </geometry>
+    </collision>      
+  </link>
+  <link name="CoM_marker">
+   <visual>
+     <origin rpy="0 0 0 " xyz="0 0 0.0"/>
+     <geometry>
+       <sphere radius="0.0016"/>
+     </geometry>
+     <material name="red_CoM_marker">
+       <color rgba="0.8 0 0.1 0.73"/>
+     </material>
+   </visual>
+ </link>
+  <link name="leftwing_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0036"/>
+     </geometry>
+     <material name="leftred">
+       <color rgba="0.1 0 0.1 0.33"/>
+     </material>
+   </visual>
+ </link>
+ <link name="rightwing_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0036"/>
+     </geometry>
+     <material name="rightred">
+       <color rgba="0.1 0 0.1 0.33"/>
+     </material>
+   </visual>
+ </link>
+ <link name="leftwing2_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0030"/>
+     </geometry>
+     <material name="leftred2">
+       <color rgba="0.1 0 0.1 0.3"/>
+     </material>
+   </visual>
+ </link>
+ <link name="rightwing2_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0030"/>
+     </geometry>
+     <material name="rightred2">
+       <color rgba="0.1 0 0.1 0.3"/>
+     </material>
+   </visual>
+ </link>
+ <link name="leftwing3_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0024"/>
+     </geometry>
+     <material name="leftred3">
+       <color rgba="0.1 0 0.1 0.27"/>
+     </material>
+   </visual>
+ </link>
+ <link name="rightwing3_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0024"/>
+     </geometry>
+     <material name="rightred3">
+       <color rgba="0.1 0 0.1 0.27"/>
+     </material>
+   </visual>
+ </link>
+  <link name="leftwing4_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0018"/>
+     </geometry>
+     <material name="leftred4">
+       <color rgba="0.1 0 0.1 0.24"/>
+     </material>
+   </visual>
+ </link>
+ <link name="rightwing4_link">
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0 0 0"/>
+     <geometry>
+       <cylinder length="0.0009" radius="0.0018"/>
+     </geometry>
+     <material name="rightred4">
+       <color rgba="0.1 0 0.1 0.24"/>
+     </material>
+   </visual>
+ </link>
+
+ <link name="rightsholder_link">
+  <inertial>
+      <mass value="10"/>
+      <!-- inertia is zero, which is the default -->
+    </inertial>
+   <visual>
+     <origin rpy="0 0 0 " xyz="0 -0.0075 0"/>
+    <geometry>
+        <box size="0.0009 0.015 0.0009"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="rightsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="leftsholder_link">
+  <inertial>
+      <mass value="10"/>
+      <!-- inertia is zero, which is the default -->
+    </inertial>
+   <visual>
+     <origin rpy="0 0 0 " xyz="0 0.0075 0"/>
+      <!-- -0.0025 0.00925"/>- -->
+    <geometry>
+        <box size="0.0009 0.015 0.0009"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="leftsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <!-- <link name="rightsholder_link">
+  <inertial>
+      <mass value="10"/>
+      </inertial>
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0.001 -0.0025 -0.00925"/>
+    <geometry>
+        <box size="0.015 0.0009 0.0009"/>
+      </geometry>
+     <material name="rightsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="leftsholder_link">
+  <inertial>
+      <mass value="10"/>
+    </inertial>
+   <visual>
+     <origin rpy="0 1.57079632679 0 " xyz="0.001 -0.0025 0.00925"/>
+    <geometry>
+        <box size="0.015 0.0009 0.0009"/>
+    </geometry>
+     <material name="leftsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link> -->
+<link name="rightspoke_link">
+   <visual>
+     <origin rpy="-0.7853 0 0 " xyz="0 0.000 0"/>
+    <geometry>
+        <box size="0.0004 0.0004 0.008"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="rightsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="leftspoke_link">
+   <visual>
+     <origin rpy="0.78539816339 0  0" xyz="0 0 0"/>
+    <geometry>
+        <box size="0.0004 0.0004 0.008"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="leftsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="rightspoke2_link">
+   <visual>
+     <origin rpy="-0.78539816339 0 0 " xyz="0 0 0"/>
+    <geometry>
+        <box size="0.0004 0.0004 0.005"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="rightsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="leftspoke2_link">
+   <visual>
+     <origin rpy="0.78539816339 0  0" xyz="0 0 0"/>
+    <geometry>
+        <box size="0.0004 0.0004 0.005"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="leftsholder_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+<link name="viconspoke1_link">
+   <visual>
+     <origin rpy="0 -0.78539816339  0 " xyz="-0.005  0  0.039"/>
+    <geometry>
+        <box size="0.013 0.0007 0.0007"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke1_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke2_link">
+   <visual>
+     <origin rpy="-0.78539816339 0.78539816339  0.78539816339" xyz="0.003 0.003 0.039"/>
+    <geometry>
+        <box size="0.013 0.0007 0.0007"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke2_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke3_link">
+   <visual>
+     <origin rpy="0 0.78539816339 -0.78539816339" xyz="0.003  -0.003  0.039"/>
+    <geometry>
+        <box size="0.013 0.0007 0.0007"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke3_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke4_link">
+   <visual>
+     <origin rpy="0 -0.78539816339  0 " xyz="0.005  0  -0.039"/>
+    <geometry>
+        <box size="0.013 0.0007 0.0007"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke1_black">
+       <color rgba="0.1 0 0.1 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke1_mark_link">
+   <visual>
+     <origin rpy="0 0  0 " xyz="-.0065  0  0"/>
+    <geometry>
+        <sphere radius="0.0024"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke4_mark_white">
+       <color rgba="1 1 1 .8"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke2_mark_link">
+   <visual>
+     <origin rpy="0 0  0 " xyz=".0065  0  0"/>
+    <geometry>
+        <sphere radius="0.0024"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke4_mark_white">
+       <color rgba="1 1 1 .8"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke3_mark_link">
+   <visual>
+     <origin rpy="0 0  0 " xyz=".0065  0  0"/>
+    <geometry>
+        <sphere radius="0.0024"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke4_mark_white">
+       <color rgba="1 1 1 .8"/>
+     </material>
+   </visual>
+ </link>
+ <link name="viconspoke4_mark_link">
+   <visual>
+     <origin rpy="0 0  0 " xyz=".0065  0  0"/>
+    <geometry>
+        <sphere radius="0.0024"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+     <material name="viconspoke4_mark_white">
+       <color rgba="1 1 1 .8"/>
+     </material>
+   </visual>
+ </link>
+
+<link name="leftactuator_link">
+   <visual>
+      <origin rpy="0 0 0" xyz=" 0 0.00175 0"/>
+      <geometry>
+        <box size="0.0035 0.0002 0.014"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+      <material name="actuator_black">
+       <color rgba="0.1 0 0.1 0.8"/>
+     </material>
+    </visual>
+ </link>
+ <link name="rightactuator_link">
+   <visual>
+      <origin rpy="0 0 0" xyz=" 0 -0.00175 0"/>
+      <geometry>
+        <box size="0.0035 0.0002 0.014"/>
+        <!-- <mesh filename="quadrotor_base.obj" scale=".02"/> -->
+      </geometry>
+      <material name="actuator_black">
+       <color rgba="0.1 0 0.1 0.8"/>
+     </material>
+    </visual>
+ </link>
+
+ <link name="left_south_cylinder">
+   <visual>
+     <origin rpy="0 0 0 " xyz="-0.3 -0.3 0.3"/>
+     <geometry>
+       <cylinder length="0.6" radius="0.007"/>
+     </geometry>
+     <material name="left_cyl_red">
+       <color rgba="0.5 0 0.5 1"/>
+     </material>
+   </visual>
+ </link>
+
+ <link name="right_south_cylinder">
+   <visual>
+     <origin rpy="0 0 0 " xyz="0.3 -0.3 0.3"/>
+     <geometry>
+       <cylinder length="0.6" radius="0.007"/>
+     </geometry>
+     <material name="left_cyl_red">
+       <color rgba="0.5 0 0.5 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="left_north_cylinder">
+   <visual>
+     <origin rpy="0 0 0 " xyz="-0.3 0.3 0.3"/>
+     <geometry>
+       <cylinder length="0.6" radius="0.007"/>
+     </geometry>
+     <material name="left_cyl_red">
+       <color rgba="0.5 0 0.5 1"/>
+     </material>
+   </visual>
+ </link>
+
+ <link name="right_north_cylinder">
+   <visual>
+     <origin rpy="0 0 0 " xyz="0.3 0.3 0.3"/>
+     <geometry>
+       <cylinder length="0.6" radius="0.007"/>
+     </geometry>
+     <material name="left_cyl_red">
+       <color rgba="0.5 0 0.5 1"/>
+     </material>
+   </visual>
+ </link>
+ <link name="stagee">
+   <visual>
+     <origin rpy="0 0 0 " xyz="0.0 0.0 0.0"/>
+     <geometry>
+       <box size="0.6 0.6 0.001" />
+     </geometry>
+     <material name="stage">
+       <color rgba="0.1 0.1 0.1 0.2"/>
+     </material>
+   </visual>
+ </link>
+
+ <!-- <link name="robobeeBody_link">
+   <visual>
+     <origin rpy="1.57079632679 0 0 " xyz=" 0  0 0"/>
+     <geometry>
+       <cylinder length="0.10" radius="0.0100"/>
+     </geometry>
+     <material name="black">
+       <color rgba="0.1 0 0.1 0.5"/>
+     </material>
+   </visual>
+ </link> -->
+<!-- <joint name="robobeeBody_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="robobeeBody_link"/>
+   <origin xyz="0 0 -0.05" rpy="1.57 0 0" />
+ </joint> -->
+ <joint name="CoM_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="CoM_marker"/>
+   <origin xyz="0 0 0.0" rpy="0.0 0 0" />
+ </joint>
+ <joint name="rightsholder_joint" type="continuous">
+   <parent link="base_link"/>
+   <child link="rightsholder_link"/>
+   <origin rpy="0 0 0" xyz="0 0 0.007" />
+   <axis xyz="0 0 1"/>
+ </joint>
+ <joint name="leftsholder_joint" type="continuous">
+   <parent link="base_link"/>
+   <child link="leftsholder_link"/>
+   <origin rpy="0 0 0 " xyz="0 0 0.007"/>
+   <axis xyz="0 0 1"/>
+ </joint>
+ <joint name="leftwing_joint" type="fixed">
+   <parent link="leftsholder_link"/>
+   <child link="leftwing_link"/>
+   <origin xyz="0 0.0047 -0.0030 " rpy="0 0 0" />
+   <axis xyz="0 0 1"/>
+ </joint>
+  <joint name="rightwing_joint" type="fixed">
+   <parent link="rightsholder_link"/>
+   <child link="rightwing_link"/>
+   <origin xyz="0 -0.0047 -0.0030" rpy="0 0 0" />
+   <axis xyz="0 0 1"/>
+ </joint>
+  <joint name="leftwing2_joint" type="fixed">
+   <parent link="leftsholder_link"/>
+   <child link="leftwing2_link"/>
+   <origin xyz="0 0.0077 -0.0028 " rpy="0 0 0" />
+ </joint>
+  <joint name="rightwing2_joint" type="fixed">
+   <parent link="rightsholder_link"/>
+   <child link="rightwing2_link"/>
+   <origin xyz="0 -0.0077 -0.0028 " rpy="0 0 0" />
+ </joint>
+ <joint name="leftwing3_joint" type="fixed">
+   <parent link="leftsholder_link"/>
+   <child link="leftwing3_link"/>
+   <origin xyz="0 0.0107 -0.0028 " rpy="0 0 0" />
+ </joint>
+  <joint name="rightwing3_joint" type="fixed">
+   <parent link="rightsholder_link"/>
+   <child link="rightwing3_link"/>
+   <origin xyz="0 -0.0107 -0.0028 " rpy="0 0 0" />
+ </joint>
+ <joint name="leftwing4_joint" type="fixed">
+   <parent link="leftsholder_link"/>
+   <child link="leftwing4_link"/>
+   <origin xyz="0 0.0137 -0.0023 " rpy="0 0 0" />
+ </joint>
+  <joint name="rightwing4_joint" type="fixed">
+   <parent link="rightsholder_link"/>
+   <child link="rightwing4_link"/>
+   <origin xyz="0 -0.0137 -0.0023 " rpy="0 0 0" />
+ </joint>
+ 
+<joint name="rightspoke_joint" type="fixed">
+   <parent link="rightsholder_link"/>
+   <child link="rightspoke_link"/>
+   <origin xyz="0 -0.0045 -0.0025" rpy="0 0 0" />
+ </joint>
+ <joint name="leftspoke_joint" type="fixed">
+   <parent link="leftsholder_link"/>
+   <child link="leftspoke_link"/>
+   <origin xyz="0 0.0045 -0.0025" rpy="0 0 0" />
+ </joint>
+
+ <joint name="rightspoke2_joint" type="fixed">
+   <parent link="rightsholder_link"/>
+   <child link="rightspoke2_link"/>
+   <origin xyz="0 -0.0095 -0.0022" rpy="0 0 0" />
+ </joint>
+ <joint name="leftspoke2_joint" type="fixed">
+   <parent link="leftsholder_link"/>
+   <child link="leftspoke2_link"/>
+   <origin xyz="0 0.0095 -0.0022" rpy="0 0 0" />
+ </joint>
+
+  <joint name="leftactuator_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="leftactuator_link"/>
+   <origin xyz="0 0 0" rpy="0 0 0" />
+ </joint>
+  <joint name="rightactuator_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="rightactuator_link"/>
+   <origin xyz="0 0 0" rpy="0 0 0" />
+ </joint>
+
+ <joint name="viconspoke1_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="viconspoke1_link"/>
+   <origin xyz="0 0 -0.05" rpy="0 0 0" />
+ </joint>
+ <joint name="viconspoke2_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="viconspoke2_link"/>
+   <origin xyz="0 0 -0.05" rpy="0 0 0" />
+ </joint>
+ <joint name="viconspoke3_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="viconspoke3_link"/>
+   <origin xyz="0 0 -0.05" rpy="0 0 0" />
+ </joint>
+ <joint name="viconspoke4_joint" type="fixed">
+   <parent link="base_link"/>
+   <child link="viconspoke4_link"/>
+   <origin xyz="0 0 0.05" rpy="0 0 0" />
+ </joint>
+
+ <joint name="viconspoke1_mark_joint" type="fixed">
+   <parent link="viconspoke1_link"/>
+   <child link="viconspoke1_mark_link"/>
+   <origin rpy="0 -0.78539816339  0 " xyz="-0.005  0  0.039" />
+ </joint>
+  <joint name="viconspoke2_mark_joint" type="fixed">
+   <parent link="viconspoke2_link"/>
+   <child link="viconspoke2_mark_link"/>
+   <origin rpy="-0.78539816339 0.78539816339  0.78539816339"  xyz="0.003 0.003 0.039" />
+ </joint>
+  <joint name="viconspoke3_mark_joint" type="fixed">
+   <parent link="viconspoke3_link"/>
+   <child link="viconspoke3_mark_link"/>
+   <origin rpy="0 0.78539816339 -0.78539816339" xyz="0.003  -0.003  0.039" />
+ </joint>
+ <joint name="viconspoke4_mark_joint" type="fixed">
+   <parent link="viconspoke4_link"/>
+   <child link="viconspoke4_mark_link"/>
+   <origin rpy="0 -0.78539816339  0 " xyz="0.005  0  -0.039" />
+ </joint>
+
+  <frame link="base_link" name="body" rpy="0 0 0" xyz="0 0 0" />
+ 
+
+  <!-- <force_element name="prop1"> 
+    <propellor lower_limit="0" upper_limit="10" scale_factor_thrust="1.0" scale_factor_moment="0.0245">
+      <parent link="base_link"/>
+      <origin xyz=".1750 0 0"/>
+      <axis xyz="0 0 1"/>
+    </propellor>
+  </force_element>
+
+  <force_element name="prop2">
+    <propellor lower_limit="-10" upper_limit="10" scale_factor_thrust="1.0" scale_factor_moment="-0.0245">
+      <parent link="base_link"/>
+      <origin xyz="0 .1750 0 "/>
+      <axis xyz="0 0 1"/>
+    </propellor>
+  </force_element>
+  
+  <force_element name="prop3">
+    <propellor lower_limit="-10" upper_limit="10" scale_factor_thrust="1.0" scale_factor_moment="0.0245">
+      <parent link="base_link"/>
+      <origin xyz="-.1750 0 0"/>
+      <axis xyz="0 0 1"/>
+    </propellor>
+  </force_element>
+  
+  <force_element name="prop4">
+    <propellor lower_limit="-10" upper_limit="10" scale_factor_thrust="1.0" scale_factor_moment="-0.0245">
+      <parent link="base_link"/>
+      <origin xyz="0 -.1750 0"/>
+      <axis xyz="0 0 1"/>
+    </propellor>
+  </force_element>
+  -->
+</robot>
+
